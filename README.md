@@ -28,7 +28,6 @@ Run locally:
 In your app:
 
 ```js
-// ...
 import composeGraphQL from 'react-apollo-helpers'
 ```
 
@@ -67,7 +66,7 @@ const createTodoMutation = {
 
 Make a presentational component that will consume the graphql operations:
 
-```
+```jsx
 const Todos = ({ myQuery: { todos }, createTodo }) => (
   <div>
     <form
@@ -129,11 +128,11 @@ const todosQuery = gql`
 
 ## Todo:
 
-[] remove composition and rename function (use [recompose](https://github.com/acdlite/recompose) instead)
-[] probably change operation spec api to match apollo-client
-[] possibly set default query response prop (currently `data`)
-[] simplify optimisticResponse with good defaults from document/schema
-[] add some common reducers for use in `updateQueries`
+- [ ] remove composition and rename function (use [recompose](https://github.com/acdlite/recompose) instead)
+- [ ] probably change operation spec api to match apollo-client
+- [ ] possibly set default query response prop (currently `data`)
+- [ ] simplify optimisticResponse with good defaults from document/schema
+- [ ] add some common reducers for use in `updateQueries`
 
 ## Why not just do a PR against react-apollo?
 
