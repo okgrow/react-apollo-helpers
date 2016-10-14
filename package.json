@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "babel-runtime": "6.x.x",
+    "ramda": "^0.22.1",
     "underscore": "^1.8.3"
   },
   "peerDependencies": {

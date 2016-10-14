@@ -1,80 +1,73 @@
+import R from 'ramda';
 // eslint-disable-next-line import/no-unresolved
 import { graphql as originalGraphql } from 'react-apollo'; // peer dependency
 
+// Wrap react-apollo's graphql() function with a new version that
+// * provides some useful default values to decrease boilerplate/repetition
+// * makes certain mutation options be individually callable as functions (rather
+//   than passing a big props fn)
 const graphql = (document, config = {}) => {
   if (!document) {
-    throw new Error(`graphql(react-apollo-helpers): A document is required. Instead got ${document}.`);
+    throw new Error(`graphql(react-apollo-helpers): A document is required. Instead got: ${document}.`);
   }
   if (document.definitions.length !== 1) {
     throw new Error(`graphql(react-apollo-helpers): Expected 1 graphQL operation. ${document.definitions.length} operations detected.`);
   }
 
-  // gather operation info from the document
-  let operationType;
-  let operationName;
-  try {
-    const definitions = document.definitions[0];
-    operationType = document.definitions[0].operation;
-    const clientOperationName = definitions.name && definitions.name.value;
-    const schemaOperationName = definitions.selectionSet.selections[0].name.value;
-    // set operationName with first of (1) user-specified name, (2) the name given to the
-    // calling operation, or (3 - always present) the name of the operation called
-    // on the GraphQL schema.
-    operationName = name || clientOperationName || schemaOperationName;
-  } catch (e) {
-    console.log(e);
-    throw new Error('graphql(react-apollo-helpers): could not parse document.');
-  }
+  // gather operation info from the graphQL document
+  const definitions = document.definitions[0];
+  const operationType = document.definitions[0].operation;
+  const clientOperationName = R.path(['name', 'value'], definitions);
+  const schemaOperationName = R.path(
+    ['selectionSet', 'selections', '0', 'name', 'value'],
+    definitions
+  );
+  // set operationName with first defined of (1) user-specified name, (2) the name given to the
+  // calling operation on the client, or (3 - always present) the name of the operation called
+  // on the GraphQL schema.
+  const operationName = name || clientOperationName || schemaOperationName;
 
   if (operationType === 'query') {
     config.name = operationName;
     return originalGraphql(document, config);
   }
 
-  // Generate default props and variables for the mutation
   if (operationType === 'mutation') {
-    const setProps = ({ ownProps, mutate }) => ({
-      // Use the mutation's name (as spec'd in the document) as a prop key
+    const { options } = config;
+
+    // The original graphql() fn has us pass a somewhat involved props function to specify
+    // prop name, variables, and mutation options. Here, we use our default values to
+    // simplify this, supporting `name` as an alternative to the props fn as well making
+    // individual options callable as functions rather than building the whole props object.
+    // You can override this (back to the original graphql() functionality) by passing a
+    // props function.
+    const setProps = config.props || (({ ownProps, mutate }) => ({
+      // Use our default operationName as the name of the prop passed to the child component.
       [operationName]: (args) => {
-        const defaultOptions = {
-          // graphql() will hand us an object with arguments. These can usually be
-          // passed back to the mutate function with no changes.
-          variables: args,
-        };
-
-        let mutationOptions = Object.assign(config.options || {}, defaultOptions);
-
-
-        // If the user passes functions for the following, call them so they can
+        // If the user passes functions for the following options, call them so they can
         // have access to args & ownProps
-        const callableProps = ['optimisticResponse', 'variables'];
-        callableProps.forEach((propName) => {
-          if (typeof mutationOptions[propName] === 'function') {
-            mutationOptions[propName] = mutationOptions[propName](args, ownProps);
-          }
+        const evalOption = opt => (typeof opt === 'function' ? opt(args, ownProps) : opt);
+        const optimisticResponse = evalOption(options.optimisticResponse);
+        // originalGraphql() will hand us an object with arguments. These can usually be
+        // passed back to the mutate function with no changes, so use as the default value.
+        const variables = evalOption(options.variables) || args;
+
+        // Destructure result.mutationResult.data directly to each update function in updateQueries
+        // as `result` so we don't have to dig through the same properties every time
+        const updateQueries = R.map((updateFn) =>
+          (prev, result) =>
+            updateFn(prev, R.path(['mutationResult', 'data', operationName], result)),
+          options.updateQueries
+        );
+
+        const mutationOptions = Object.assign({}, options, {
+          variables,
+          optimisticResponse,
+          updateQueries,
         });
-
-        // fix updateQueries so we don't have to dig through the same properties every time
-        if (mutationOptions.updateQueries) {
-          const fixedUpdateQueries = {};
-          Object.keys(mutationOptions.updateQueries).forEach((queryName) => {
-            const updateFn = mutationOptions.updateQueries[queryName];
-            fixedUpdateQueries[queryName] = (prev, result) => {
-              const mutationResult = result.mutationResult.data[operationName];
-              return updateFn(prev, mutationResult);
-            };
-          });
-
-          // prevent an error that comes from mutating mutationOptions in place
-          mutationOptions = Object.assign({},
-            mutationOptions,
-            { updateQueries: fixedUpdateQueries }
-          );
-        }
-
         return mutate(mutationOptions);
       },
-    });
+    }));
     return originalGraphql(document, { props: setProps });
   }
 
