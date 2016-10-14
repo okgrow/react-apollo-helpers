@@ -109,8 +109,8 @@ export default compose(todosQuery, createTodo)(Todos);
 `graphql()` creates a higher-order component (HOC) that will add a single property to your presentational component when composed with it. That prop will have either the query results or will be a function you can call to perform its mutation. You can compose multiple graphQL operations (and other non-graphQL HOCs) together on one presentational component with `compose()` as shown above. The name of the prop that will be handed down to your presentational component will be set in one of 3 ways, with preference going to 1 before 2 before 3.
 
 1. `name` property: `graphql(gql..., {name: 'myProp'})`. Unlike basic react-apollo, you can set this for mutations as well as queries. Overrides any defaults.
-2. client operation name (see below). This is the name you use for `updateQueries` and is defined only on the client. This is the usual default.
-3. schema operation name (see below). This is the name of the query name in your main graphQL schema, which matches a resolver of the same name on the server. If you don't specify a client query/mutation name, this will be the prop name.
+2. client operation name (see below). This is the name you use for `updateQueries` and is defined only on the client.
+3. schema operation name (see below). This is the name of the query name in your main graphQL schema, which matches a resolver of the same name on the server.
 
 ```js
 const getTodos = graphql(gql`
@@ -121,7 +121,6 @@ const getTodos = graphql(gql`
   }`
 );
 ```
-
 
 ### optimisticResponse
 
