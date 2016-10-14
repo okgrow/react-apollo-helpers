@@ -47,7 +47,27 @@ const graphql = (document, config = {}) => {
         // If the user passes functions for the following options, call them so they can
         // have access to args & ownProps
         const evalOption = opt => (typeof opt === 'function' ? opt(args, ownProps) : opt);
-        const optimisticResponse = evalOption(options.optimisticResponse);
+        // Preset the first level of the optimisticResponse object, which is pure boilerplate,
+        // but allow user to use the full object if preferred.
+        // TODO: query the type returned by the mutation and fill that in as well
+        // TODO: if the return type includes a field called id or _id, automatically generate
+        //       a random value for that.
+        let optimisticResponse = null;
+        if (R.has('optimisticResponse', options)) {
+          const optimisticResponseSpec = evalOption(options.optimisticResponse);
+          if (!optimisticResponseSpec.__typename) {
+            throw new Error('react-apollo-helpers: __typename not found in optimisticResponse. ' +
+              'You should set it to the return type of the mutation that you called.');
+          }
+          optimisticResponse = optimisticResponseSpec.__typename === 'Mutation'
+            // user is building the full optimisticResponseSpec object
+            ? optimisticResponseSpec
+            // add the base JSON for the user
+            : {
+              __typename: 'Mutation',
+              [operationName]: optimisticResponseSpec,
+            };
+        }
         // originalGraphql() will hand us an object with arguments. These can usually be
         // passed back to the mutate function with no changes, so use as the default value.
         const variables = evalOption(options.variables) || args;
@@ -71,7 +91,21 @@ const graphql = (document, config = {}) => {
     return originalGraphql(document, { props: setProps });
   }
 
-  throw new Error(`graphql(react-apollo-helpers): Operation '${operationType}' is not supported.`);
+  // If passed an operation that is not recognized, it might be a new function not yet
+  // supported here. Pass on to the original graphql() function so the dev doesn't have
+  // to import it separately.
+  console.log(`graphql(react-apollo-helpers): Operation '${operationType}' is not supported. Passing to react-apollo`);
+  return originalGraphql(document, config);
 };
 
-export { graphql };
+// Convenience functions
+
+// Use the parameters of the mutation plus any additional fields provided by the user to create
+// an optimisticResponse
+const optimisticResponse = (additionalFields = {}) => (args) => {
+  // TODO: query schema to generate default __typename
+  // TODO: allow user to pass a fn
+  return Object.assign(args, additionalFields);
+};
+
+export { graphql, optimisticResponse };
