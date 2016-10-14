@@ -75,7 +75,7 @@ const Todos = ({ getTodos: { todos }, createTodo }) => (
     <form
       onSubmit={e => {
         e.preventDefault();
-        createTodo(e.currentTarget.goal.value);
+        createTodo({ goal: e.currentTarget.goal.value });
       }}
     >
       <input
@@ -88,9 +88,7 @@ const Todos = ({ getTodos: { todos }, createTodo }) => (
     <ul>
       {
         todos.map(todo => (
-          <li>
-            {todo}
-          </li>
+          <li> {todo.goal} </li>
         ))
       }
     </ul>
