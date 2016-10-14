@@ -11,7 +11,6 @@ An alternate api for [react-apollo](https://github.com/apollostack/react-apollo)
   - automatically sets the prop name to the name of the mutation you are calling (use `name` as you would with a query to set a different name)
   - much less boilerplate than vanilla react-apollo for most mutations
   - still compatible with normal react-apollo syntax if you need/prefer it for certain mutations – just specify `props`. This will override defaults provided by this module. (see [react-apollo docs](http://dev.apollodata.com/react/) for usage)
-* compose graphql operations together with presentational components easily and intuitively (this feature will probably be removed in favor of [recompose](https://github.com/acdlite/recompose)), but the use pattern will be nearly the same.
 
 ## Basic Usage
 
@@ -24,6 +23,9 @@ Run locally:
 * clone this repo and get the path with `pwd`
 * go to your app directory
 * run `npm link path/to/react-apollo-helpers`
+
+
+** XXX Examples are not current **
 
 In your app:
 
