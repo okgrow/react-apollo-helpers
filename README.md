@@ -104,21 +104,23 @@ export default compose(todosQuery, createTodo)(Todos);
 
 ### Prop name passed to the presentational component
 
-`graphql()` creates a higher-order component (HOC) that will add a single property to your presentational component when composed with it. That prop will have either the query results or will be a function you can call to perform its mutation. You can compose multiple graphQL operations (and other non-graphQL HOCs) together on one presentational component with `compose()` as shown above. The name of the prop that will be handed down to your presentational component will be set in one of 3 ways, with preference going to 1 before 2 before 3.
+`graphql()` creates a higher-order component (HOC) that will add a single property to your presentational component when composed with it. That prop will have either the query results or will be a function you can call to perform its mutation. You can compose multiple graphQL operations (and other non-graphQL HOCs) together on one presentational component with `compose()` as shown above. The name of the prop that will be handed down to your presentational component will be set in one of 3 ways, with preference going to 1 before 2 before 3. 
 
 1. `name` property: `graphql(gql..., {name: 'myProp'})`. Unlike basic react-apollo, you can set this for mutations as well as queries. Overrides any defaults.
-2. client operation name (see below). This is the name you use for `updateQueries` and is defined only on the client.
-3. schema operation name (see below). This is the name of the query name in your main graphQL schema, which matches a resolver of the same name on the server.
+2. operation name (see below). This is the name you use for `updateQueries` and is also sent to the server so you can tell what queries came from where.
+3. schema query name (see below). This is the name in your main graphQL schema, which matches a resolver of the same name on the server.
 
 ```js
 const getTodos = graphql(gql`
-  query getTodos {  <--- 2. client name: `getTodos`
+  query getTodos {  <--- 2. operation name: `getTodos`
     todos {         <--- 3. schema name: `todos`
       goal
     }
   }`
 );
 ```
+
+Generally, you will want to use the operation name (2). Although it can seem redundant with the schema query name in trivial examples, in a real app you may query the same base query with different arguments (different pagination, filters, etc.).
 
 ### optimisticResponse
 
