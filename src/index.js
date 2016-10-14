@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import { graphql as originalGraphql } from 'react-apollo'; // peer dependency
 
-const graphql = (document, config) => {
+const graphql = (document, config = {}) => {
   if (!document) {
     throw new Error(`graphql(react-apollo-helpers): A document is required. Instead got ${document}.`);
   }
@@ -12,19 +12,22 @@ const graphql = (document, config) => {
   // gather operation info from the document
   let operationType;
   let operationName;
-  let schemaOperationName;
   try {
     const definitions = document.definitions[0];
     operationType = document.definitions[0].operation;
-    operationName = definitions.name && definitions.name.value;
-    schemaOperationName = definitions.selectionSet.selections[0].name.value;
+    const clientOperationName = definitions.name && definitions.name.value;
+    const schemaOperationName = definitions.selectionSet.selections[0].name.value;
+    // set operationName with first of (1) user-specified name, (2) the name given to the
+    // calling operation, or (3 - always present) the name of the operation called
+    // on the GraphQL schema.
+    operationName = name || clientOperationName || schemaOperationName;
   } catch (e) {
     console.log(e);
     throw new Error('graphql(react-apollo-helpers): could not parse document.');
   }
 
-  // Just use graphql's api for queries
   if (operationType === 'query') {
+    config.name = operationName;
     return originalGraphql(document, config);
   }
 
@@ -32,7 +35,7 @@ const graphql = (document, config) => {
   if (operationType === 'mutation') {
     const setProps = ({ ownProps, mutate }) => ({
       // Use the mutation's name (as spec'd in the document) as a prop key
-      [name || schemaOperationName]: (args) => { // XXX fix this
+      [operationName]: (args) => {
         const defaultOptions = {
           // graphql() will hand us an object with arguments. These can usually be
           // passed back to the mutate function with no changes.
