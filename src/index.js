@@ -64,8 +64,8 @@ const graphql = (document, config = {}) => {
             // user is building the full optimisticResponseSpec object
             [R.propEq('__typename', 'Mutation'), R.identity],
             // add the base JSON for the user
-            [R.T, R.assoc(operationName, R.__, {__typename: 'Mutation'})]
-          ])(optimisticResponseSpec);
+            [R.T, R.assoc(operationName, R.__, { __typename: 'Mutation' })],
+        ])(optimisticResponseSpec);
 
         // originalGraphql() will hand us an object with arguments. These can usually be
         // passed back to the mutate function with no changes, so use as the default value.
