@@ -2,15 +2,54 @@
 
 Work in progress. API is subject to change!
 
-An alternate api for [react-apollo](https://github.com/apollostack/react-apollo) with helpful defaults and less boilerplate. See the [react-apollo docs](http://dev.apollodata.com/react/) for more info.
+We love [react-apollo](https://github.com/apollostack/react-apollo)! Let's explore some possibilities for further improving its API. Instead of [this](http://dev.apollodata.com/react/mutations.html#optimistic-ui):
+
+```js
+const CommentPageWithData = graphql(submitComment, {
+  props: ({ ownProps, mutate }) => ({
+    submit: ({ repoFullName, commentContent }) => mutate({
+      variables: { repoFullName, commentContent },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        submitComment: {
+          __typename: 'Comment',
+          postedBy: ownProps.currentUser,
+          createdAt: +new Date,
+          content: commentContent,
+        },
+      },
+    }),
+  }),
+})(CommentPage);
+```
+
+Use this:
+
+```js
+const CommentPageWithData = graphql(submitComment, {
+  options: {
+    optimisticResponse: ({ commentContent }, ownProps) => ({
+      __typename: 'Comment',
+      postedBy: ownProps.currentUser,
+      createdAt: +new Date,
+      content: commentContent,
+    }),
+  },
+})(CommentPage);
+```
+
+This package provides an enhanced `graphql()` function for [react-apollo](https://github.com/apollostack/react-apollo) with helpful defaults and less boilerplate. See the [react-apollo docs](http://dev.apollodata.com/react/) for more on how to use it. It still calls react-apollo under the hood – this is purely an API experiment.
+
+*(Disclaimer: the above code would need to use `name: 'submit'` to be 100% backwards compatible, but in practice you could avoid this by making the prop name in the presentational component match the query's operation name)*
 
 ## Features
 
 * Works like the current `graphql()`, but with less code.
 * Intelligent but overridable default names for your query and mutation propnames.
+* Prop naming works the same for queries and mutations
 * Intuitive mutations:
   - `variables` will default to the arguments specified by your mutation `document`. You no longer have to specify them in most cases.
-  - much less boilerplate than vanilla react-apollo for most mutations
+  - optimisticResponse can take a function and allows you to return only the type you are returning (omitting the enclosing type `Mutation`).
   - still compatible with normal react-apollo syntax if you need/prefer it for certain mutations – just specify `props`. This will override defaults provided by this module. (see [react-apollo docs](http://dev.apollodata.com/react/) for usage)
 
 ## Basic Usage
@@ -107,7 +146,7 @@ export default compose(todosQuery, createTodo)(Todos);
 `graphql()` creates a higher-order component (HOC) that will add a single property to your presentational component when composed with it. That prop will have either the query results or will be a function you can call to perform its mutation. You can compose multiple graphQL operations (and other non-graphQL HOCs) together on one presentational component with `compose()` as shown above. The name of the prop that will be handed down to your presentational component will be set in one of 3 ways, with preference going to 1 before 2 before 3. 
 
 1. `name` property: `graphql(gql..., {name: 'myProp'})`. Unlike basic react-apollo, you can set this for mutations as well as queries. Overrides any defaults.
-2. operation name (see below). This is the name you use for `updateQueries` and is also sent to the server so you can tell what queries came from where.
+2. [operation name](http://graphql.org/learn/queries/#operation-name) (see below). This is the name you use for `updateQueries` and is also sent to the server so you can tell what queries came from where.
 3. schema query name (see below). This is the name in your main graphQL schema, which matches a resolver of the same name on the server.
 
 ```js
@@ -120,7 +159,7 @@ const getTodos = graphql(gql`
 );
 ```
 
-Generally, you will want to use the operation name (2). Although it can seem redundant with the schema query name in trivial examples, in a real app you may query the same base query with different arguments (different pagination, filters, etc.).
+Generally, you will want to use the operation name (2). Although it can seem redundant with the schema query name in trivial examples, in a real app you may query the same base query differently (different result sets, pagination, filters, etc.).
 
 ### optimisticResponse
 
