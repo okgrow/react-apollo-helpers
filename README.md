@@ -1,8 +1,8 @@
 # react-apollo-helpers
 
-Work in progress. API is subject to change!
+Work in progress. API is subject to change.
 
-We love [react-apollo](https://github.com/apollostack/react-apollo)! Let's explore some possibilities for further improving its API. Instead of [this](http://dev.apollodata.com/react/mutations.html#optimistic-ui):
+Provides a thin wrapper for [react-apollo](https://github.com/apollostack/react-apollo)'s `graphql()` and other convenience functions to explore some possibilities for simplifying its API. Instead of [this](http://dev.apollodata.com/react/mutations.html#optimistic-ui):
 
 ```js
 const CommentPageWithData = graphql(submitComment, {
@@ -38,9 +38,9 @@ const CommentPageWithData = graphql(submitComment, {
 })(CommentPage);
 ```
 
-This package provides an enhanced `graphql()` function for [react-apollo](https://github.com/apollostack/react-apollo) with helpful defaults and less boilerplate. See the [react-apollo docs](http://dev.apollodata.com/react/) for more on how to use it. It still calls react-apollo under the hood – this is purely an API experiment.
+See the [react-apollo docs](http://dev.apollodata.com/react/) for more details on the context/use of this function. It still calls react-apollo under the hood – this is purely an API experiment.
 
-*(Disclaimer: the above code would need to use `name: 'submit'` to be 100% backwards compatible, but in practice you could avoid this by making the prop name in the presentational component match the query's operation name)*
+*(Disclaimer: the above code would need to use `name: 'submit'` to be 100% backwards compatible with the example in the react-apollo docs, but in practice you could avoid this by making the prop name in the presentational component match the query's operation name)*
 
 ## Features
 
@@ -50,7 +50,7 @@ This package provides an enhanced `graphql()` function for [react-apollo](https:
 * Intuitive mutations:
   - `variables` will default to the arguments specified by your mutation `document`. You no longer have to specify them in most cases.
   - optimisticResponse can take a function and allows you to return only the type you are returning (omitting the enclosing type `Mutation`).
-  - still compatible with normal react-apollo syntax if you need/prefer it for certain mutations – just specify `props`. This will override defaults provided by this module. (see [react-apollo docs](http://dev.apollodata.com/react/) for usage)
+  - still compatible with normal react-apollo syntax if you need/prefer it for certain mutations – just specify `props`. This will override defaults provided by this module. Subscriptions currently pass-through unchanged. (see [react-apollo docs](http://dev.apollodata.com/react/) for usage)
 
 ## Basic Usage
 
@@ -218,6 +218,7 @@ There is no change to how `updateQueries` works.
 - [x] possibly set default query response prop (currently `data`)
 - [x] simplify optimisticResponse with good defaults from document/schema
 - [ ] add some common reducers for use in `updateQueries`
+- [ ] possible improvements for subscriptions (currently passes through unchanged, so they should work the same here as in regular react-apollo)
 
 ## Why not just do a PR against react-apollo?
 

@@ -8,7 +8,8 @@ import { graphql as originalGraphql } from 'react-apollo'; // peer dependency
 //   than passing a big props fn)
 const graphql = (document, config = {}) => {
   if (!document) {
-    throw new Error(`graphql(react-apollo-helpers): A document is required. Instead got: ${document}.`);
+    throw new Error(`graphql(react-apollo-helpers): A document is required. Instead got:
+        ${JSON.stringify(document)}.`);
   }
   if (document.definitions.length !== 1) {
     throw new Error(`graphql(react-apollo-helpers): Expected 1 graphQL operation. ${document.definitions.length} operations detected.`);
