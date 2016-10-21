@@ -78,7 +78,7 @@ const graphql = (document, config = {}) => {
         const updateQueries = R.map((updateFn) =>
           (prev, result) =>
             updateFn(prev, R.path(['mutationResult', 'data', operationName], result)),
-          options.updateQueries
+          options.updateQueries || {}
         );
 
         const mutationOptions = Object.assign({}, options, {
