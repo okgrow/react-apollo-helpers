@@ -147,12 +147,12 @@ export default compose(todosQuery, createTodo)(Todos);
 
 1. `name` property: `graphql(gql..., {name: 'myProp'})`. Unlike basic react-apollo, you can set this for mutations as well as queries. Overrides any defaults.
 2. [operation name](http://graphql.org/learn/queries/#operation-name) (see below). This is the name you use for `updateQueries` and is also sent to the server so you can tell what queries came from where.
-3. schema query name (see below). This is the name in your main graphQL schema, which matches a resolver of the same name on the server.
+3. query/mutation name (see below). This is the name in your main graphQL schema, which matches a resolver of the same name on the server.
 
 ```js
 const getTodos = graphql(gql`
   query getTodos {  <--- 2. operation name: `getTodos`
-    todos {         <--- 3. schema name: `todos`
+    todos {         <--- 3. query name: `todos`
       goal
     }
   }`
