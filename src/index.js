@@ -18,6 +18,7 @@ const graphql = (document, config = {}) => {
   // gather operation info from the graphQL document
   const definitions = document.definitions[0];
   const operationType = document.definitions[0].operation;
+  const { name } = config;
   const clientOperationName = R.path(['name', 'value'], definitions);
   const schemaOperationName = R.path(
     ['selectionSet', 'selections', '0', 'name', 'value'],
