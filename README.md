@@ -54,9 +54,9 @@ See the [react-apollo docs](http://dev.apollodata.com/react/) for more details o
 
 ## Basic Usage
 
-Add react-apollo-helpers to your `package.json`:
+Add react-apollo and react-apollo-helpers to your `package.json`:
 
-* (future, when this is published) `npm install --save react-apollo-helpers`
+* `npm install --save react-apollo react-apollo-helpers`
 
 Run locally: 
 
