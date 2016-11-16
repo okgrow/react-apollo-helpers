@@ -54,7 +54,7 @@ const graphql = (document, config = {}) => {
         // TODO: query the type returned by the mutation and fill that in as well
         // TODO: if the return type includes a field called id or _id, automatically generate
         //       a random value for that.
-        const optimisticResponseSpec = evalOption(options.optimisticResponse);
+        const optimisticResponseSpec = options && evalOption(options.optimisticResponse);
         if (optimisticResponseSpec && !optimisticResponseSpec.__typename) {
           throw new Error('react-apollo-helpers: __typename not found in optimisticResponse. ' +
             'You should set it to the return type of the mutation that you called.');
@@ -71,14 +71,14 @@ const graphql = (document, config = {}) => {
 
         // originalGraphql() will hand us an object with arguments. These can usually be
         // passed back to the mutate function with no changes, so use as the default value.
-        const variables = evalOption(options.variables) || args;
+        const variables = evalOption(options && options.variables) || args;
 
         // Destructure result.mutationResult.data directly to each update function in updateQueries
         // as `result` so we don't have to dig through the same properties every time
         const updateQueries = R.map((updateFn) =>
           (prev, result) =>
             updateFn(prev, R.path(['mutationResult', 'data', operationName], result)),
-          options.updateQueries || {}
+          (options && options.updateQueries) || {}
         );
 
         const mutationOptions = Object.assign({}, options, {
