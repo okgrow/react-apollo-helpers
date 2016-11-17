@@ -54,19 +54,27 @@ const graphql = (document, config = {}) => {
         // TODO: query the type returned by the mutation and fill that in as well
         // TODO: if the return type includes a field called id or _id, automatically generate
         //       a random value for that.
+
         const optimisticResponseSpec = options && evalOption(options.optimisticResponse);
-        if (optimisticResponseSpec && !optimisticResponseSpec.__typename) {
+        if (
+            optimisticResponseSpec
+            && R.is(Object, optimisticResponseSpec)
+            && !optimisticResponseSpec.__typename
+          ) {
           throw new Error('react-apollo-helpers: __typename not found in optimisticResponse. ' +
             'You should set it to the return type of the mutation that you called.');
         }
 
         const optimisticResponse = R.cond([
-            // null when options.optimisticResponse is undefined
-            [R.not, R.always(null)],
-            // user is building the full optimisticResponseSpec object
-            [R.propEq('__typename', 'Mutation'), R.identity],
-            // add the base JSON for the user
-            [R.T, R.assoc(operationName, R.__, { __typename: 'Mutation' })],
+          // null when options.optimisticResponse is undefined
+          [R.not, R.always(null)],
+          // response is a scalar (not type object), so return as-is
+          [R.compose(R.not, R.is(Object)),
+            R.assoc(operationName, R.__, { __typename: 'Mutation' })],
+          // user is building the full optimisticResponseSpec object
+          [R.propEq('__typename', 'Mutation'), R.identity],
+          // add the base JSON for the user
+          [R.T, R.assoc(operationName, R.__, { __typename: 'Mutation' })],
         ])(optimisticResponseSpec);
 
         // originalGraphql() will hand us an object with arguments. These can usually be
