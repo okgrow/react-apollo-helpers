@@ -1,6 +1,6 @@
 {
   "name": "react-apollo-helpers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An alternate api for react-apollo with helpful defaults and less boilerplate.",
   "author": "Robert Dickert",
   "keywords": [
