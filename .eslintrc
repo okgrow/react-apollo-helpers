@@ -11,5 +11,14 @@
   },
   "settings": {
     "import/resolver": "meteor",
+  },
+  "globals": {
+    "describe": "true",
+    "it": "true",
+    "expect": "true",
+    "app": "true",
+    "request":"true",
+    "before": "true",
+    "after": "true"
   }
 }

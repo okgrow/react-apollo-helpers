@@ -1,10 +1,29 @@
-import {expect} from 'chai';
-import {sum} from '../';
-const {describe, it} = global;
+import chai from 'chai';
+import td from 'testdouble';
+import gql from 'graphql-tag';
+import react from 'react';
 
-describe('sum', () => {
-  it('should add two numbers correctly', async () => {
-    const result = await sum(10, 20);
-    expect(result).to.be.equal(30);
+const gqlDouble = gql`
+  query getTodos {
+    todos {
+      goal
+    }
+  }`;
+
+const reactApolloMock = td.object(['graphql']);
+let graphql;
+
+describe('graphql', () => {
+
+  before(() => {
+    td.replace("react-apollo", reactApolloMock);
+    graphql = require('../index').graphql;
+  });
+
+
+  it('passes arguments correctly to originalGraphql', () => {
+    graphql(gqlDouble);
+
+    td.verify(reactApolloMock.graphql(gqlDouble, {name: 'getTodos'}));
   });
 });

@@ -15,6 +15,8 @@ const graphql = (document, config = {}) => {
     throw new Error(`graphql(react-apollo-helpers): Expected 1 graphQL operation. ${document.definitions.length} operations detected.`);
   }
 
+  const { name } = config;
+
   // gather operation info from the graphQL document
   const definitions = document.definitions[0];
   const operationType = document.definitions[0].operation;
