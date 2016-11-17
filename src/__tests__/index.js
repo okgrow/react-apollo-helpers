@@ -22,8 +22,8 @@ describe('graphql', () => {
 
 
   it('passes arguments correctly to originalGraphql', () => {
-    graphql(gqlDouble, {});
+    graphql(gqlDouble);
 
-    td.verify(reactApolloMock.graphql(gqlDouble, { }));
+    td.verify(reactApolloMock.graphql(gqlDouble, {name: 'getTodos'}));
   });
 });

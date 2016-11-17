@@ -20,6 +20,7 @@
     "start": "babel src -d dist --watch"
   },
   "devDependencies": {
+    "apollo-client": "^0.5.4",
     "babel-cli": "6.x.x",
     "babel-core": "^6.17.0",
     "babel-eslint": "4.x.x",
@@ -36,8 +37,11 @@
     "eslint-plugin-import": "^1.10.3",
     "eslint-plugin-jsx-a11y": "^1.2.0",
     "eslint-plugin-react": "^5.2.2",
+    "graphql-tag": "^0.1.16",
     "mocha": "2.x.x",
     "nodemon": "1.7.x",
+    "react": "^15.4.0",
+    "react-apollo": "^0.6.0",
     "testdouble": "^1.8.0"
   },
   "dependencies": {
